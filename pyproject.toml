@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PySyFit"
+version = "1.0.0"
+authors = [
+    { name = "Matteo Villosio", email = "github@matteovillosio.com" },
+]
+description = "A Python library for working with Garmin FIT workout files using Pydantic models"
+readme = "README.md"
+requires-python = ">=3.6"
+dynamic = ["dependencies"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.urls]
+"Homepage" = "https://github.com/Tsadoq/pysyfit"
+"Bug Tracker" = "https://github.com/Tsadoq/pysyfit/issues"
