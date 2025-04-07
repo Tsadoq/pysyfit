@@ -18,7 +18,7 @@ def create_test_workout():
     file_id = FileIdMessage(
         type=FileType.WORKOUT,
         manufacturer=1,  # Garmin
-        product=0,
+        product=20,
         serial_number=0,
         time_created=datetime.datetime.now(),
         number=None
@@ -26,67 +26,131 @@ def create_test_workout():
 
     # Create workout message
     workout = WorkoutMessage(
-        wkt_name="Test Workout",
-        sport=Sport.CYCLING,
+        wkt_name="5K Inter",
+        sport=Sport.RUNNING,
         sub_sport=SubSport.GENERIC,
-        num_valid_steps=5
+        num_valid_steps=10
     )
 
     # Create workout steps
     steps = [
-        # Warmup step
+        # Warm-up step
         WorkoutStep(
             message_index=0,
-            wkt_step_name="_A_",
+            wkt_step_name="Warm",
             intensity=Intensity.WARMUP,
             duration_type=WorkoutStepDurationType.TIME,
-            duration_time=60,  # 60 seconds
+            duration_time=600.0,  # 10 minutes
             target_type=WorkoutStepTargetType.HEART_RATE,
-            target_hr_zone=2
+            target_hr_zone=1
         ),
-        # Hard interval
+
+        # Interval 1
         WorkoutStep(
             message_index=1,
-            wkt_step_name="B1_",
+            wkt_step_name="Inte",
             intensity=Intensity.ACTIVE,
             duration_type=WorkoutStepDurationType.DISTANCE,
-            duration_distance=500,  # 500 meters
-            target_type=WorkoutStepTargetType.POWER,
-            target_power_zone=5
+            duration_distance=800.0,  # 800 meters
+            target_type=WorkoutStepTargetType.OPEN,
+            target_value=1
         ),
-        # Recovery interval
+
+        # Recovery 1
         WorkoutStep(
             message_index=2,
-            wkt_step_name="B2_",
-            intensity=Intensity.ACTIVE,
-            duration_type=WorkoutStepDurationType.DISTANCE,
-            duration_distance=500,  # 500 meters
-            target_type=WorkoutStepTargetType.POWER,
-            target_power_zone=3
+            wkt_step_name="Reco",
+            intensity=Intensity.REST,
+            duration_type=WorkoutStepDurationType.TIME,
+            duration_time=120.0,  # 2 minutes
+            target_type=WorkoutStepTargetType.SPEED,
+            target_value=1
         ),
-        # Repeat step
+
+        # Interval 2
         WorkoutStep(
             message_index=3,
-            wkt_step_name="Rep",
+            wkt_step_name="Inte",
             intensity=Intensity.ACTIVE,
-            duration_type=WorkoutStepDurationType.REPEAT_UNTIL_STEPS_CMPLT,
-            duration_step=1,  # 1 repetition
+            duration_type=WorkoutStepDurationType.DISTANCE,
+            duration_distance=800.0,  # 800 meters
             target_type=WorkoutStepTargetType.OPEN,
-            target_value=3  # Repeat 3 steps
+            target_value=1
         ),
-        # Cooldown
+
+        # Recovery 2
         WorkoutStep(
             message_index=4,
-            wkt_step_name="_C_",
+            wkt_step_name="Reco",
+            intensity=Intensity.REST,
+            duration_type=WorkoutStepDurationType.TIME,
+            duration_time=120.0,  # 2 minutes
+            target_type=WorkoutStepTargetType.SPEED,
+            target_value=1
+        ),
+
+        # Interval 3
+        WorkoutStep(
+            message_index=5,
+            wkt_step_name="Inte",
+            intensity=Intensity.ACTIVE,
+            duration_type=WorkoutStepDurationType.DISTANCE,
+            duration_distance=800.0,  # 800 meters
+            target_type=WorkoutStepTargetType.OPEN,
+            target_value=1
+        ),
+
+        # Recovery 3
+        WorkoutStep(
+            message_index=6,
+            wkt_step_name="Reco",
+            intensity=Intensity.REST,
+            duration_type=WorkoutStepDurationType.TIME,
+            duration_time=120.0,  # 2 minutes
+            target_type=WorkoutStepTargetType.SPEED,
+            target_value=1
+        ),
+
+        # Interval 4
+        WorkoutStep(
+            message_index=7,
+            wkt_step_name="Inte",
+            intensity=Intensity.ACTIVE,
+            duration_type=WorkoutStepDurationType.DISTANCE,
+            duration_distance=800.0,  # 800 meters
+            target_type=WorkoutStepTargetType.OPEN,
+            target_value=1
+        ),
+
+        # Recovery 4
+        WorkoutStep(
+            message_index=8,
+            wkt_step_name="Reco",
+            intensity=Intensity.REST,
+            duration_type=WorkoutStepDurationType.TIME,
+            duration_time=120.0,  # 2 minutes
+            target_type=WorkoutStepTargetType.SPEED,
+            target_value=1
+        ),
+
+        # Cool-down step
+        WorkoutStep(
+            message_index=9,
+            wkt_step_name="Cool",
             intensity=Intensity.COOLDOWN,
-            duration_type=WorkoutStepDurationType.HR_LESS_THAN,
-            duration_hr=225,  # 225 bpm
-            target_type=WorkoutStepTargetType.POWER,
-            target_power_zone=1
+            duration_type=WorkoutStepDurationType.TIME,
+            duration_time=600.0,  # 10 minutes
+            target_type=WorkoutStepTargetType.CADENCE,
+            target_value=2
         )
     ]
 
-    return Workout(file_id=file_id, workout=workout, steps=steps)
+    # Create and return the complete workout
+    return Workout(
+        file_id=file_id,
+        workout=workout,
+        steps=steps
+    )
 
 
 def test_fit_file(fit_file_path):
@@ -117,7 +181,22 @@ def test_fit_file(fit_file_path):
             print("File integrity check failed: Missing workout_step messages")
             return False
 
-        print("File integrity check passed")
+        # Print message details for debugging
+        print("\nFile ID Message:")
+        for field in file_id_msgs[0].fields:
+            print(f"  {field.name}: {field.value}")
+
+        print("\nWorkout Message:")
+        for field in workout_msgs[0].fields:
+            print(f"  {field.name}: {field.value}")
+
+        print("\nWorkout Steps:")
+        for i, step_msg in enumerate(workout_step_msgs):
+            print(f"\nStep {i}:")
+            for field in step_msg.fields:
+                print(f"  {field.name}: {field.value}")
+
+        print("\nFile integrity check passed")
         return True
     except Exception as e:
         print(f"File integrity check failed: {e}")
@@ -154,17 +233,18 @@ def main():
     # Print hexdump for debugging
     hexdump(output_file)
 
-    # Compare with sample file
+    # Compare with sample file if available
     sample_file = "./test/WorkoutRepeatSteps.fit"
-    print("Comparing with sample file:")
-    hexdump(sample_file)
+    if os.path.exists(sample_file):
+        print("\nComparing with sample file:")
+        hexdump(sample_file)
 
     # Print overall result
     if test_result:
-        print("File validity test: PASS")
+        print("\nFile validity test: PASS")
         print("Overall test result: PASS")
     else:
-        print("File validity test: FAIL")
+        print("\nFile validity test: FAIL")
         print("Overall test result: FAIL")
 
 
