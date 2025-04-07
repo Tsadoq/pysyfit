@@ -1,15 +1,10 @@
 import os
-import sys
-import struct
-from typing import Dict, List, Optional, Union
-from io import BytesIO
 import datetime
 
 from pysyfit.models.enum_types import FileType, SubSport, Sport, WorkoutStepDurationType, WorkoutStepTargetType, \
     Intensity
 from pysyfit.models.workout_models import Workout, FileIdMessage, WorkoutMessage, WorkoutStep
 from pysyfit.toolkit.converter import write_fit_file
-from pysyfit.utils.timestamp_utils import datetime_to_fit_timestamp
 
 
 def create_test_workout():
