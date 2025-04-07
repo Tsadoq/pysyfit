@@ -1,5 +1,5 @@
 # FIT epoch offset (seconds between Unix epoch and FIT epoch)
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 FIT_EPOCH_OFFSET = 631065600  # Seconds from UTC 00:00 Dec 31 1989 to Unix Epoch
 
@@ -10,7 +10,12 @@ def datetime_to_fit_timestamp(dt: datetime) -> int:
     :param dt: The Python datetime to convert
     :return: The equivalent FIT timestamp
     """
-    timestamp = int((dt - datetime(1970, 1, 1)).total_seconds())
+    # Ensure dt is timezone-aware
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    
+    epoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
+    timestamp = int((dt - epoch).total_seconds())
     return timestamp - FIT_EPOCH_OFFSET
 
 
@@ -21,7 +26,10 @@ def fit_timestamp_to_datetime(timestamp: int) -> datetime:
     :return: The equivalent Python datetime
     """
     if isinstance(timestamp, datetime):
+        # Ensure datetime is timezone-aware
+        if timestamp.tzinfo is None:
+            return timestamp.replace(tzinfo=timezone.utc)
         return timestamp
 
     # Otherwise convert from integer timestamp
-    return datetime.fromtimestamp(timestamp + FIT_EPOCH_OFFSET, UTC)
+    return datetime.fromtimestamp(timestamp + FIT_EPOCH_OFFSET, timezone.utc)

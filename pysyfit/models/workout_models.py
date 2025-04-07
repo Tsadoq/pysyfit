@@ -67,20 +67,20 @@ class WorkoutStepDuration(BaseModel):
         if v is not None:
             return v
             
-        duration_type = values.get('duration_type')
+        duration_type = values.data.get('duration_type')
         
-        if duration_type == WorkoutStepDurationType.TIME and values.get('duration_time') is not None:
-            return values.get('duration_time')
-        elif duration_type == WorkoutStepDurationType.DISTANCE and values.get('duration_distance') is not None:
-            return values.get('duration_distance')
-        elif duration_type in [WorkoutStepDurationType.HR_LESS_THAN, WorkoutStepDurationType.HR_GREATER_THAN] and values.get('duration_hr') is not None:
-            return values.get('duration_hr')
-        elif duration_type == WorkoutStepDurationType.CALORIES and values.get('duration_calories') is not None:
-            return values.get('duration_calories')
-        elif duration_type in [WorkoutStepDurationType.REPEAT_UNTIL_STEPS_CMPLT] and values.get('duration_step') is not None:
-            return values.get('duration_step')
-        elif duration_type in [WorkoutStepDurationType.POWER_LESS_THAN, WorkoutStepDurationType.POWER_GREATER_THAN] and values.get('duration_power') is not None:
-            return values.get('duration_power')
+        if duration_type == WorkoutStepDurationType.TIME and values.data.get('duration_time') is not None:
+            return values.data.get('duration_time')
+        elif duration_type == WorkoutStepDurationType.DISTANCE and values.data.get('duration_distance') is not None:
+            return values.data.get('duration_distance')
+        elif duration_type in [WorkoutStepDurationType.HR_LESS_THAN, WorkoutStepDurationType.HR_GREATER_THAN] and values.data.get('duration_hr') is not None:
+            return values.data.get('duration_hr')
+        elif duration_type == WorkoutStepDurationType.CALORIES and values.data.get('duration_calories') is not None:
+            return values.data.get('duration_calories')
+        elif duration_type in [WorkoutStepDurationType.REPEAT_UNTIL_STEPS_CMPLT] and values.data.get('duration_step') is not None:
+            return values.data.get('duration_step')
+        elif duration_type in [WorkoutStepDurationType.POWER_LESS_THAN, WorkoutStepDurationType.POWER_GREATER_THAN] and values.data.get('duration_power') is not None:
+            return values.data.get('duration_power')
         
         # For OPEN duration type, no value is needed
         if duration_type == WorkoutStepDurationType.OPEN:
@@ -118,18 +118,18 @@ class WorkoutStepTarget(BaseModel):
         if v is not None:
             return v
             
-        target_type = values.get('target_type')
+        target_type = values.data.get('target_type')
         
-        if target_type == WorkoutStepTargetType.HEART_RATE and values.get('target_hr_zone') is not None:
-            return values.get('target_hr_zone')
-        elif target_type == WorkoutStepTargetType.POWER and values.get('target_power_zone') is not None:
-            return values.get('target_power_zone')
-        elif target_type == WorkoutStepTargetType.CADENCE and values.get('target_cadence_zone') is not None:
-            return values.get('target_cadence_zone')
-        elif target_type == WorkoutStepTargetType.SPEED and values.get('target_speed_zone') is not None:
-            return values.get('target_speed_zone')
-        elif target_type == WorkoutStepTargetType.SWIM_STROKE and values.get('target_stroke_type') is not None:
-            return values.get('target_stroke_type')
+        if target_type == WorkoutStepTargetType.HEART_RATE and values.data.get('target_hr_zone') is not None:
+            return values.data.get('target_hr_zone')
+        elif target_type == WorkoutStepTargetType.POWER and values.data.get('target_power_zone') is not None:
+            return values.data.get('target_power_zone')
+        elif target_type == WorkoutStepTargetType.CADENCE and values.data.get('target_cadence_zone') is not None:
+            return values.data.get('target_cadence_zone')
+        elif target_type == WorkoutStepTargetType.SPEED and values.data.get('target_speed_zone') is not None:
+            return values.data.get('target_speed_zone')
+        elif target_type == WorkoutStepTargetType.SWIM_STROKE and values.data.get('target_stroke_type') is not None:
+            return values.data.get('target_stroke_type')
         
         # For OPEN target type, no value is needed
         if target_type == WorkoutStepTargetType.OPEN:
@@ -165,14 +165,14 @@ class Workout(BaseModel):
     file_id: FileIdMessage = Field(default_factory=FileIdMessage)
     workout: WorkoutMessage
     steps: List[WorkoutStep]
-
+    
     @model_validator(mode="after")
-    def check_a_equals_b(cls, model: "Workout") -> "Workout":
+    def validate_num_steps(self):
         """Ensure num_valid_steps matches the number of steps."""
-        if model.workout.num_valid_steps == len(model.steps):
-            raise ValueError("The values of 'a' and 'b' must be the same")
-        return model
-
+        if self.workout.num_valid_steps != len(self.steps):
+            self.workout.num_valid_steps = len(self.steps)
+        return self
+    
     @field_validator('steps')
     def validate_steps(cls, v):
         """Ensure steps have sequential message_index values."""
